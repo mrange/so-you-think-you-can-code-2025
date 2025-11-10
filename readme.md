@@ -58,7 +58,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 7** | TBA| TBA | 🚪 Unclaimed |
 | **December 8** | TBA| TBA | 🚪 Unclaimed |
 | **December 9** | TBA| TBA | 🚪 Unclaimed |
-| **December 10** | TBA| TBA | 🚪 Unclaimed |
+| **December 10** | Magnus Thor| Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$)  | 🚪 Unclaimed |
 | **December 11** | TBA| TBA | 🚪 Unclaimed |
 | **December 12** | TBA| TBA | 🚪 Unclaimed |
 | **December 13** | TBA| TBA | 🚪 Unclaimed |
