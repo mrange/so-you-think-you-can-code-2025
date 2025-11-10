@@ -68,7 +68,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 17** | TBA| TBA | 🚪 Unclaimed |
 | **December 18** | TBA| TBA | 🚪 Unclaimed |
 | **December 19** | TBA| TBA | 🚪 Unclaimed |
-| **December 20** | TBA| TBA | 🚪 Unclaimed |
+| **December 20** | [canmom](https://github.com/canmom)| Will likely involve shader programming and/or Rust. | 🔒 Claimed |
 | **December 21** | Frank Taylor | Markov Melody Machine | 🔒 Claimed |
 | **December 22** | TBA| TBA | 🚪 Unclaimed |
 | **December 23** | TBA| TBA | 🚪 Unclaimed |
