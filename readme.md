@@ -60,14 +60,14 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 9** | TBA| TBA | 🚪 Unclaimed |
 | **December 10** | Magnus Thor| Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$)  | 🔒 Unclaimed |
 | **December 11** | TBA| TBA | 🚪 Unclaimed |
-| **December 12** | TBA| TBA | 🚪 Unclaimed |
+| **December 12** | Starfighter | The WebGPU MultiPass Pattern: A Framework for Implementing GPU-Accelerated Algorithms | 🚪 Claimed |
 | **December 13** | TBA| TBA | 🚪 Unclaimed |
 | **December 14** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | TBA | 🔒 Claimed |
 | **December 15** | Magnus Thor | Fractal Horizons: Creating Infinite Geometry in Lua/Roblox | 🔒 Claimed |
 | **December 16** | TBA| TBA | 🚪 Unclaimed |
 | **December 17** | TBA| TBA | 🚪 Unclaimed |
 | **December 18** | Starfighter | ​The Recursive Swedish Sphere Algorithm | 🔒 Claimed |
-| **December 19** | TBA| TBA | 🚪 Unclaimed |
+| **December 19** | Magnus Thor | Ray Marching Complex Life into a WebGPU Fragment Shader | 🚪 Claimed |
 | **December 20** | [canmom](https://github.com/canmom)| A Nest of Divergence-Free Fields | 🔒 Claimed |
 | **December 21** | Frank Taylor | Markov Melody Machine | 🔒 Claimed |
 | **December 22** | TBA| TBA | 🚪 Unclaimed |
