@@ -53,12 +53,12 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 2** | TBA| TBA | 🚪 Unclaimed |
 | **December 3** | TBA| TBA | 🚪 Unclaimed |
 | **December 4** | TBA| TBA | 🚪 Unclaimed |
-| **December 5** | TBA| TBA | 🚪 Unclaimed |
+| **December 5** | PCruch | When Every Byte Counts: Hashing, Golfing, and Packing for the Web | 🔒 Claimed |
 | **December 6** | [Shoofle](https://github.com/shoofle) | An Asynchronous Assembly Article | 🔒 Claimed |
 | **December 7** | TBA| TBA | 🚪 Unclaimed |
 | **December 8** | TBA| TBA | 🚪 Unclaimed |
 | **December 9** | TBA| TBA | 🚪 Unclaimed |
-| **December 10** | Magnus Thor| Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$)  | 🔒 Unclaimed |
+| **December 10** | Magnus Thor| Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$)  | 🔒 Claimed |
 | **December 11** | TBA| TBA | 🚪 Unclaimed |
 | **December 12** | Starfighter | The WebGPU MultiPass Pattern: A Framework for Implementing GPU-Accelerated Algorithms | 🚪 Claimed |
 | **December 13** | TBA| TBA | 🚪 Unclaimed |
