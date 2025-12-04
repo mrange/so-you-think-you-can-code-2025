@@ -53,7 +53,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 2** | Magnus Thor| [The Grinch Who Stole Swizzle Write](day02/readme.md) | 🎅 Open |
 | **December 3** | Magnus Thor | [From Frame Rate to Nanoseconds: Precision Timing in WebGPU](day03/readme.md) | 🎅 Open |
 | **December 4** | PCruch| [From Pixels to Playback](day04/readme.md) | 🎅 Open |
-| **December 5** | PCruch | When Every Byte Counts: Hashing, Golfing, and Packing for the Web | 🔒 Claimed |
+| **December 5** | Frank Taylor | CSS Houdini for Developers - Paint Worklet's | 🔒 Claimed |
 | **December 6** | [Shoofle](https://github.com/shoofle) | An Asynchronous Assembly Article | 🔒 Claimed |
 | **December 7** | TBA| TBA | 🚪 Unclaimed |
 | **December 8** | TBA| TBA | 🚪 Unclaimed |
@@ -64,7 +64,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 13** | TBA| TBA | 🚪 Unclaimed |
 | **December 14** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | TBA | 🔒 Claimed |
 | **December 15** | Magnus Thor | Fractal Horizons: Creating Infinite Geometry in Lua/Roblox | 🔒 Claimed |
-| **December 16** | TBA| TBA | 🚪 Unclaimed |
+| **December 16** | PCruch | When Every Byte Counts: Hashing, Golfing, and Packing for the Web | 🔒 Claimed |
 | **December 17** | TBA| TBA | 🚪 Unclaimed |
 | **December 18** | Starfighter | ​The Recursive Swedish Sphere Algorithm | 🔒 Claimed |
 | **December 19** | Magnus Thor | Ray Marching Complex Life into a WebGPU Fragment Shader | 🚪 Claimed |
