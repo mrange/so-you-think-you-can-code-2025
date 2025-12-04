@@ -52,7 +52,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 1** | Magnus Thor| [Array Superpowers: Mastering Fluent LINQ in TypeScript](day01/readme.md) | 🎅 Open |
 | **December 2** | Magnus Thor| [The Grinch Who Stole Swizzle Write](day02/readme.md) | 🎅 Open |
 | **December 3** | Magnus Thor | [From Frame Rate to Nanoseconds: Precision Timing in WebGPU](day03/readme.md) | 🎅 Open |
-| **December 4** | PCruch| TBA | 🔒 Claimed |
+| **December 4** | PCruch| [From Pixels to Playback](day04/readme.md) | 🎅 Open |
 | **December 5** | PCruch | When Every Byte Counts: Hashing, Golfing, and Packing for the Web | 🔒 Claimed |
 | **December 6** | [Shoofle](https://github.com/shoofle) | An Asynchronous Assembly Article | 🔒 Claimed |
 | **December 7** | TBA| TBA | 🚪 Unclaimed |
