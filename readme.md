@@ -57,7 +57,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 3** | Magnus Thor | [From Frame Rate to Nanoseconds: Precision Timing in WebGPU](day03/readme.md) | 🎅 Open |
 | **December 4** | PCruch| [From Pixels to Playback](day04/readme.md) | 🎅 Open |
 | **December 5** | Frank Taylor | [CSS Houdini for Developers - Paint Worklet](day05/readme.md) | 🎅 Open |
-| **December 6** | [Shoofle](https://github.com/shoofle) | An Asynchronous Assembly Article | 🔒 Claimed |
+| **December 6** | [Shoofle](https://github.com/shoofle) | [An Asynchronous Assembly Article](day06/readme.md) | 🎅 Open |
 | **December 7** | TBA| TBA | 🚪 Unclaimed |
 | **December 8** | TBA| TBA | 🚪 Unclaimed |
 | **December 9** | TBA| TBA | 🚪 Unclaimed |
