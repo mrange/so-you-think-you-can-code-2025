@@ -59,7 +59,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 5** | Frank Taylor | [CSS Houdini for Developers - Paint Worklet](day05/readme.md) | 🎅 Open |
 | **December 6** | [Shoofle](https://github.com/shoofle) | [An Asynchronous Assembly Article](day06/readme.md) | 🎅 Open |
 | **December 7** | Magnus Thor| [Off-Thread Graphics, On-Stream Video](day07/readme.md) | 🎅 Open |
-| **December 8** | TBA| TBA | 🚪 Unclaimed |
+| **December 8** | [Mårten 'mrange' Rånge](https://github.com/mrange/)| [Introduction to Path Tracers](day08/readme.md) | 🎅 Open |
 | **December 9** | TBA| TBA | 🚪 Unclaimed |
 | **December 10** | Magnus Thor| Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$)  | 🔒 Claimed |
 | **December 11** | TBA| TBA | 🚪 Unclaimed |
