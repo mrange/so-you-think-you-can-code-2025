@@ -60,8 +60,8 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 6** | [Shoofle](https://github.com/shoofle) | [An Asynchronous Assembly Article](day06/readme.md) | 🎅 Open |
 | **December 7** | Magnus Thor| [Off-Thread Graphics, On-Stream Video](day07/readme.md) | 🎅 Open |
 | **December 8** | [Mårten 'mrange' Rånge](https://github.com/mrange/)| [Introduction to Path Tracers](day08/readme.md) | 🎅 Open |
-| **December 9** | TBA| TBA | 🚪 Unclaimed |
-| **December 10** | Magnus Thor| Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$)  | 🔒 Claimed |
+| **December 9** | [Magnus Thor](https://github.com/MagnusThor) | [Shader Adventures in Rust: WebGPU + WebAssembly](day09/readme.md) | 🎅 Open |
+| **December 10** | TBA | TBA  | 🔒 Claimed |
 | **December 11** | TBA| TBA | 🚪 Unclaimed |
 | **December 12** | Starfighter | The WebGPU MultiPass Pattern: A Framework for Implementing GPU-Accelerated Algorithms | 🚪 Claimed |
 | **December 13** | TBA| TBA | 🚪 Unclaimed |
@@ -73,9 +73,9 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 19** | Magnus Thor | Ray Marching Complex Life into a WebGPU Fragment Shader | 🚪 Claimed |
 | **December 20** | [canmom](https://github.com/canmom)| A Nest of Divergence-Free Fields | 🔒 Claimed |
 | **December 21** | Frank Taylor | Markov Melody Machine | 🔒 Claimed |
-| **December 22** | TBA| TBA | 🚪 Unclaimed |
+| **December 22** | Magnus Thor | Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$) | 🔒 Claimed |
 | **December 23** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | TBA | 🔒 Claimed |
-| **December 24** | TBA| TBA | 🚪 Unclaimed |
+| **December 24** | Ricky Davies| TBA | 🔒 Claimed |
 | **December 25** | TBA| TBA | 🚪 Unclaimed |
 
 ---
