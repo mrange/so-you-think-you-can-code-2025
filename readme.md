@@ -61,14 +61,14 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 7** | Magnus Thor| [Off-Thread Graphics, On-Stream Video](day07/readme.md) | 🎅 Open |
 | **December 8** | [Mårten 'mrange' Rånge](https://github.com/mrange/)| [Introduction to Path Tracers](day08/readme.md) | 🎅 Open |
 | **December 9** | [Magnus Thor](https://github.com/MagnusThor) | [Shader Adventures in Rust: WebGPU + WebAssembly](day09/readme.md) | 🎅 Open |
-| **December 10** | TBA | TBA  | 🔒 Claimed |
+| **December 10** | Magnus Thor | [Bringing .NET’s Task Parallel Library (TPL) to TypeScript](day10/readme.md)  | 🎅 Open |
 | **December 11** | TBA| TBA | 🚪 Unclaimed |
 | **December 12** | Starfighter | The WebGPU MultiPass Pattern: A Framework for Implementing GPU-Accelerated Algorithms | 🚪 Claimed |
 | **December 13** | TBA| TBA | 🚪 Unclaimed |
 | **December 14** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | TBA | 🔒 Claimed |
 | **December 15** | Magnus Thor | Fractal Horizons: Creating Infinite Geometry in Lua/Roblox | 🔒 Claimed |
 | **December 16** | PCruch | When Every Byte Counts: Hashing, Golfing, and Packing for the Web | 🔒 Claimed |
-| **December 17** | TBA| TBA | 🚪 Unclaimed |
+| **December 17** | Benni Dibb| Recreating a Hit Song on an 8-Bit Sound Chip | 🔒 Claimed |
 | **December 18** | Starfighter | ​The Recursive Swedish Sphere Algorithm | 🔒 Claimed |
 | **December 19** | Magnus Thor | Ray Marching Complex Life into a WebGPU Fragment Shader | 🚪 Claimed |
 | **December 20** | [canmom](https://github.com/canmom)| A Nest of Divergence-Free Fields | 🔒 Claimed |
