@@ -63,8 +63,8 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 9** | [Magnus Thor](https://github.com/MagnusThor) | [Shader Adventures in Rust: WebGPU + WebAssembly](day09/readme.md) | 🎅 Open |
 | **December 10** | Magnus Thor | [Bringing .NET’s Task Parallel Library (TPL) to TypeScript](day10/readme.md)  | 🎅 Open |
 | **December 11** | PCruch | [When Every Byte Counts: Hashing, Golfing, and Packing for the Web](day11/readme.md) | 🎅 Open |
-| **December 12** | Starfighter | The WebGPU MultiPass Pattern: A Framework for Implementing GPU-Accelerated Algorithms | 🚪 Claimed |
-| **December 13** | TBA| TBA | 🚪 Unclaimed |
+| **December 12** | Frank Taylor | [Node-RED Choreographing  Christmas Lights to Rhythmic Markov Melodies](day12/readme.md)) | 🎅 Open  |
+| **December 13** | Starfighter | The WebGPU MultiPass Pattern: A Framework for Implementing GPU-Accelerated Algorithms | 🚪 Claimed |
 | **December 14** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | TBA | 🔒 Claimed |
 | **December 15** | Magnus Thor | Fractal Horizons: Creating Infinite Geometry in Lua/Roblox | 🔒 Claimed |
 | **December 16** | PCruch | TBA | 🔒 Claimed |
@@ -73,10 +73,10 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 19** | Magnus Thor | Ray Marching Complex Life into a WebGPU Fragment Shader | 🚪 Claimed |
 | **December 20** | [canmom](https://github.com/canmom)| A Nest of Divergence-Free Fields | 🔒 Claimed |
 | **December 21** | Frank Taylor | Markov Melody Machine | 🔒 Claimed |
-| **December 22** | Magnus Thor | Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$) | 🔒 Claimed |
+| **December 22** | Magnus Thor |  | 🔒 Claimed |
 | **December 23** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | TBA | 🔒 Claimed |
 | **December 24** | Ricky Davies| TBA | 🔒 Claimed |
-| **December 25** | TBA| TBA | 🚪 Unclaimed |
+| **December 25** | Magnus Thor | Compute → Graphics: Real-Time Volumetric Refraction in WGSL ($128^3$) | 🔒 Claimed |
 
 ---
 

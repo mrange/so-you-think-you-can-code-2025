@@ -1,0 +1,108 @@
+[
+    {
+        "id": "054c2015e30101eb",
+        "type": "tab",
+        "label": "Markov Chain",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "85594b36343fe049",
+        "type": "inject",
+        "z": "054c2015e30101eb",
+        "name": "startMarkovSong",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "50",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "object",
+        "payloadType": "date",
+        "x": 210,
+        "y": 200,
+        "wires": [
+            [
+                "77cfdf003330b775"
+            ]
+        ]
+    },
+    {
+        "id": "77cfdf003330b775",
+        "type": "function",
+        "z": "054c2015e30101eb",
+        "name": "Markov Xmas Composer (Adaptive)",
+        "func": "const transitions = {\n    // Note: The Markov Chain now generates objects: {note: nextPitch, dur: durationMultiplier}\n    'E': [\n        {note: 'E', dur: 1.0}, {note: 'E', dur: 1.0}, {note: 'E', dur: 0.5},\n        {note: 'E', dur: 0.5}, {note: 'E', dur: 1.0}, {note: 'G', dur: 0.5}\n    ],\n    'G': [\n        {note: 'C', dur: 1.0}, {note: 'C', dur: 0.5}, {note: 'C', dur: 1.0}, \n        {note: 'D', dur: 0.5}\n    ],\n    'C': [\n        {note: 'D', dur: 1.0}, {note: 'D', dur: 0.5}, {note: 'E', dur: 1.0}\n    ],\n    'D': [\n        {note: 'E', dur: 1.0}, {note: 'E', dur: 0.5}, {note: 'E', dur: 1.0}, \n        {note: 'E', dur: 0.5}\n    ],\n    'START': [\n        {note: 'E', dur: 1.0}, {note: 'D', dur: 1.0}, {note: 'C', dur: 1.0}\n    ]\n};\n\nconst colorMap = {\n    'E': 'R', // Red\n    'D': 'G', // Green\n    'C': 'W', // White\n    'G': 'B'  // Blue\n};\n\nconst targetBPM = 80;\nconst tempoMS = 60000 / targetBPM; // Milliseconds per beat (750ms at 80BPM)\nconst songLength = 64;             // Number of notes/flashes\nconst releaseFactor = 0.9;         // Light turns off at 90% of the note's duration\n\nfunction getNextState(currentState) {\n    const possibilities = transitions[currentState];\n    if (!possibilities || possibilities.length === 0) return null;\n    const randomIndex = Math.floor(Math.random() * possibilities.length);\n    return possibilities[randomIndex];\n}\n\n// --- 1. Generate the Note & Duration Sequence ---\nlet currentPitch = 'START';\nlet generatedSequence = [];\n\nfor (let i = 0; i < songLength; i++) {\n    let nextState = getNextState(currentPitch);\n    if (currentPitch === 'START') {\n        currentPitch = nextState.note;\n        i = -1; \n        continue;\n    }\n\n    const nextColor = colorMap[nextState.note] || 'R';\n    \n    // Store both the color and the duration multiplier\n    generatedSequence.push({color: nextColor, dur: nextState.dur}); \n    currentPitch = nextState.note;\n\n    if (currentPitch === null) break;\n}\n\n// Output the full sequence for debugging before sending commands\nnode.send([null, { payload: generatedSequence, topic: \"composition/sequence\" }, null]);\n\n// --- 2. Schedule Timed Light Commands (Adaptive Timing) ---\nlet cumulativeDelay = 0;\n\nfor (const note of generatedSequence) {\n    const topic = `light/${note.color}`;\n    \n    // Calculate the duration this specific note should last\n    const noteDurationMS = tempoMS * note.dur;\n\n    // Schedule the light ON command\n    setTimeout(() => {\n        // Output 1: Sends the ON command at the start of the beat\n        node.send([{ payload: `${note.color}_ON`, topic: topic }, null, null]); \n    }, cumulativeDelay);\n\n    // Schedule the light OFF command (Adaptive Duration)\n    setTimeout(() => {\n        // Output 1: Sends the OFF command based on noteDurationMS * releaseFactor\n        node.send([{ payload: `${note.color}_OFF`, topic: topic }, null, null]); \n    }, cumulativeDelay + (noteDurationMS * releaseFactor));\n\n    // Advance the delay by the full duration of the note\n    cumulativeDelay += noteDurationMS;\n}\n\nreturn null;",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 200,
+        "wires": [
+            [
+                "1d7725574bca0615",
+                "ec3c48ab5560742c"
+            ],
+            [
+                "fc706f90378c9838"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "1d7725574bca0615",
+        "type": "debug",
+        "z": "054c2015e30101eb",
+        "name": "Light Commands (ON/OFF)",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "fc706f90378c9838",
+        "type": "debug",
+        "z": "054c2015e30101eb",
+        "name": "Generated Sequence Array",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "ec3c48ab5560742c",
+        "type": "comment",
+        "z": "054c2015e30101eb",
+        "name": "Connect to HUE/Light Nodes Here",
+        "info": "This wire should connect to your specific light control nodes (e.g., node-red-contrib-huemagic, MQTT, etc.). The incoming message will contain the specific color (R, G, W, B) and the state (ON or OFF), triggered at precise times by the script.",
+        "x": 770,
+        "y": 280,
+        "wires": []
+    }
+]
