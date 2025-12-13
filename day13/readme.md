@@ -228,6 +228,8 @@ Another cool thing with glow-tracers is that you can really abuse the distance f
 
 Speaking of [Xor](https://www.shadertoy.com/user/Xor), that is one of the people you should follow on ShaderToy for small shaders. [FabriceNeyret2](https://www.shadertoy.com/user/FabriceNeyret2) is another extremely skilled size coder. It's not uncommon that I spend an evening optimizing my shader, only for them to find like 30 more chars to remove upon publishing. I honestly felt I did a pretty good job, but that's how skilled [FabriceNeyret2](https://www.shadertoy.com/user/FabriceNeyret2) is!
 
+🫶 [mrange](https://www.shadertoy.com/user/mrange) 🫶
+
 ## 🎄 What's Under the Christmas Tree? 🎁
 
 I've learned a few tricks since writing the original. Applying them:

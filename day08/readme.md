@@ -16,11 +16,9 @@ The trade-off is that path tracers work best with explicit geometry like spheres
 
 Here's how it works: we send a ray from the eye into the scene and let it bounce, choosing each new direction randomly (using a distribution called uniform Lambertian) until it either hits a light source or escapes the scene. Because of this randomness, we need to send many rays per pixel and average the results to reduce noise.
 
-That's the basic idea.
-
 ## Let's Start Coding a Simple Ray Tracer
 
-Let's build a simple ray tracer that traces two planes and a sphere using basic shading so we can see the objects. This simple ray tracer will serve as our foundation. In later parts, we'll replace this direct lighting with path tracing to get those natural effects we discussed.
+Let's build a simple ray tracer that traces two planes and a sphere using basic shading so we can see the objects. This simple ray tracer will serve as our foundation. In later parts, we'll replace this direct lighting with path tracing.
 
 We'll work with normalized screen coordinates `p` (ranging from -1 to 1) to determine which direction each pixel should look. First, we need to set up our ray based on the camera origin and where it's looking:
 ```glsl
@@ -42,7 +40,7 @@ vec3
 ;
 ```
 
-Testing the intersection between a plane and a ray is straightforward. For a plane at a fixed coordinate, we solve for where the ray crosses it:
+For a plane at a fixed coordinate, we solve for where the ray crosses it:
 ```glsl
   float
     // Distance to floor intersection (y = -1 plane)
@@ -53,7 +51,7 @@ Testing the intersection between a plane and a ray is straightforward. For a pla
   ;
 ```
 
-Testing ray-sphere intersection is more involved, so I borrowed some code from IQ:
+Finding ray-sphere intersection is more involved, so I borrowed some code from IQ:
 ```glsl
 // License: MIT, author: Inigo Quilez, found: https://iquilezles.org/articles/intersectors/
 float ray_unitsphere(vec3 ro, vec3 rd) {
@@ -102,15 +100,15 @@ Here's the complete shader running in ShaderToy:
 [ShaderToy link](https://www.shadertoy.com/view/WfKyWm)
 [Source code link](example0.glsl)
 
-The scene works, but it looks flat and lifeless. Why? Surfaces don't block light from each other, so there are no shadows. There's no sense of how nearby geometry darkens corners and crevices. What's missing are shadows and ambient occlusion.
+The scene works, but it looks flat and lifeless. Why? Surfaces don't block light from each other, so there are no shadows. There's no sense of how nearby geometry darkens corners. What's missing are shadows and ambient occlusion.
 
 We could fake these effects with various tricks to make it look decent, but since this series is about path tracing, let's see how these effects emerge naturally from the algorithm. In the next section, we'll add random bounces to our rays and implement a simple path tracer.
 
 ## 📢 Expect Noise
 
-Path tracing uses randomness (the Monte Carlo method). The trade-off for physically accurate lighting is the resulting image noise (speckling).
+Path tracing uses randomness (the Monte Carlo method). The trade-off for physically accurate lighting is the resulting image noise.
 
-We can reduce this noise by increasing the number of samples (at the cost of framerate) or by applying a filter. In this example, we use temporal accumulation. This technique blends new frames with old ones to average out the speckles over time.
+We can reduce this noise by increasing the number of samples (at the cost of framerate) or by applying a filter. In this example, we use a simple temporal accumulation. This technique blends new frames with old ones to average out the speckles over time.
 
 ## A Simple Path Tracer
 
@@ -321,7 +319,7 @@ if(missed || hit_light || hit_stripe) {
 
 Finally, we'll make surfaces reflective. In reality, all surfaces become mirror-like at grazing angles. This is called the Fresnel effect. You can see this if you stand next to a lake: looking straight down, you see through the water to the bottom. But looking toward the horizon, the water becomes a perfect mirror.
 
-We compute a Fresnel factor that increases as the viewing angle gets shallower. We use this factor to randomly choose between reflection and diffuse scattering. This technique is called Russian Roulette. Rather than tracing both paths (which would require recursion that GLSL doesn't support), we randomly pick one and weight the result appropriately. Over many samples, this averages out to the correct result.
+We compute a Fresnel factor that increases as the viewing angle gets shallower. We use this factor to randomly choose between reflection and diffuse scattering. Rather than tracing both paths (which would require recursion that GLSL doesn't support), we randomly pick one and weight the result appropriately. Over many samples, this averages out to the correct result.
 
 Some surfaces are always reflective regardless of angle: the sphere acts as a chrome ball, and about half the wall cells become perfect mirrors (determined by their hash). This creates interesting reflections throughout the scene.
 
@@ -379,7 +377,7 @@ All these effects, the soft shadows, the color mixing, the reflections, emerged 
 
 ## Your Turn
 
-Thanks for following this guide! We've seen how complex lighting effects emerge from a surprisingly simple core principle: trace, bounce, accumulate. Now it's your turn to experiment...
+Thanks for following this guide! Now it's your turn to experiment...
 
 Try modifying the shader: change the surface colors, add more geometry, adjust the Fresnel factor, or make different surfaces reflective. Break things, fix them, and watch how light behaves. The best way to truly understand path tracing is to play with it yourself.
 
