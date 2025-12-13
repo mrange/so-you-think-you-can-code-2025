@@ -65,7 +65,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 11** | PCruch | [When Every Byte Counts: Hashing, Golfing, and Packing for the Web](day11/readme.md) | 🎅 Open |
 | **December 12** | Frank Taylor | [Node-RED Choreographing  Christmas Lights to Rhythmic Markov Melodies](day12/readme.md)) | 🎅 Open  |
 | **December 13** | Starfighter | The WebGPU MultiPass Pattern: A Framework for Implementing GPU-Accelerated Algorithms | 🚪 Claimed |
-| **December 14** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | TBA | 🔒 Claimed |
+| **December 14** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | [Disassembling a Compact Glow-Tracer](day14/readme.md) | 🔒 Open |
 | **December 15** | Magnus Thor | Fractal Horizons: Creating Infinite Geometry in Lua/Roblox | 🔒 Claimed |
 | **December 16** | PCruch | TBA | 🔒 Claimed |
 | **December 17** | Benni Dibb| Recreating a Hit Song on an 8-Bit Sound Chip | 🔒 Claimed |
