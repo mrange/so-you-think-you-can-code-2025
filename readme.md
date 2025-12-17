@@ -68,7 +68,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 14** | Magnus Thor | [Building a Real-Time WGSL Shader Playground with WebGPU and WebRTC](day14/readme.md) | 🎅 Open |
 | **December 15** | PCruch | [AssemblyScript - Making WebAssembly Accessible for All](day15/readme.md) | 🎅 Open |
 | **December 16** | Magnus Thor  | [Building Procedural Worlds in Roblox Using Luau & Rojo](day16/readme.md)  | 🎅 Open |
-| **December 17** | Benni Dibb| Recreating a Hit Song on an 8-Bit Sound Chip | 🔒 Claimed |
+| **December 17** | Benni Dibb| [Recreating a Hit Song on an 8-Bit Sound Chip](day17/readme.md) | 🎅 Open |
 | **December 18** | Starfighter | ​The Recursive Swedish Sphere Algorithm | 🔒 Claimed |
 | **December 19** | Magnus Thor | Ray Marching Complex Life into a WebGPU Fragment Shader | 🚪 Claimed |
 | **December 20** | [canmom](https://github.com/canmom)| A Nest of Divergence-Free Fields | 🔒 Claimed |
