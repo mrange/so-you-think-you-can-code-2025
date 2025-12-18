@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "AssemblyScript Build (asbuild)",
+      "type": "npm",
+      "script": "asbuild",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "detail": "Runs 'npm run asbuild' to compile AssemblyScript to WebAssembly"
+    }
+  ]
+}

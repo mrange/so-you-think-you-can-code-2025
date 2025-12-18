@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="module">
+        import { add, calculatePi, drawMandelbrot, memory } from "./build/release.js";
+        const sum = add(1, 2);
+        console.log(`Sum: ${sum}`)
+        const start = performance.now();
+        // Running 200 million samples inside WebAssembly
+        const PI = calculatePi(200_000_000n);
+        const end = performance.now();
+        console.log(`Calculated PI: ${PI}`);
+        console.log(`Time taken in Wasm: ${end - start} ms`);
+
+        const canvas = document.querySelector("#canvas");
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width;
+        const h = canvas.height;
+        const WasmStartPtr = 0;
+        const iterations = 255;
+
+        // 1. Get the ImageData object (to hold the final pixels)
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const data = imageData.data; // The UInt8ClampedArray view of the ImageData
+
+        // 2. Call the Wasm function (It writes the red pixels to memory.buffer)
+        drawMandelbrot(WasmStartPtr, w, h, iterations);
+
+        // 3. READ BACK: Create a typed view of the Wasm memory
+        // This is necessary to access the data Wasm just wrote.
+        const wasmByteMemory = new Uint8ClampedArray(memory.buffer);
+
+        // 4. COPY: Copy the red pixel data from Wasm memory into the Canvas's ImageData buffer
+        const bytesToCopy = w * h * 4;
+        data.set(wasmByteMemory.subarray(WasmStartPtr, WasmStartPtr + bytesToCopy));
+
+        // 5. RENDER: Put the modified ImageData buffer back onto the canvas
+        ctx.putImageData(imageData, 0, 0);
+
+
+    </script>
+</head>
+
+<body>
+
+    <canvas id="canvas" width="800" height="450"></canvas>
+
+
+</body>
+
+</html>

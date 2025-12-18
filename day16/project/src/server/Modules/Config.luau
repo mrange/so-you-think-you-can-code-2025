@@ -1,0 +1,12 @@
+local Config = {}
+
+Config.BOUNDARY_BUFFER = 1
+Config.BOUNDARY_WALLHEIGHT = 300
+Config.TERRAIN_SIZE = 250
+Config.WALL_THICKNESS = 60
+Config.HEIGHT_SCALE = 300
+Config.TERRAIN_RES = 4
+Config.GROUND_BUFFER = 0
+Config.CAVE_COUNT = 15
+
+return Config
