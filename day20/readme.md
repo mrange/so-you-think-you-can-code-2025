@@ -6,6 +6,8 @@ On creating complex, swirly noodle shapes with compute shaders in Rust and wgpu.
 
 ## What are we trying to do here?
 
+Well the short answer is that we're gonna make [this](https://github.com/canmom/so-you-think-you-can-code-2025/tree/main/day20). The long answer follows...
+
 Have a look at this image.
 
 ![A spiraling shape made of white strands.](assets/uzumaki.png)
@@ -21,6 +23,8 @@ In the process, I'll be going through...
 - combining compute shaders with render pipelines
 
 I'm not going to be using any of the more modern styles of graphics programming here (indirect draw, mesh shaders, bindless, etc. etc.); ultimately we're going to be using wgpu in a very traditional way.
+
+All source code from this project is available [here](https://github.com/canmom/noodles).
 
 ### A quick overview of the maths
 
@@ -1227,7 +1231,7 @@ Now for the result...
 
 ![A complex spiraling shape made of white strands](assets/realtime-uzumaki.png)
 
-I adjusted the camera positioning to give it a lissajous motion that flies you in and out of the noodles. You can see it in-browser here (todo: upload the web build).
+I adjusted the camera positioning to give it a lissajous motion that flies you in and out of the noodles. You can see it in-browser [here](https://github.com/canmom/so-you-think-you-can-code-2025/tree/main/day20).
 
 It's not quite perfect. I'm not sure what causes the sharp discontinuities in gradient. There are sometimes twisting artefacts, resulting from how I'm calculating the normal and bitangent. Nevertheless, we can easily have a thousand twisting noodles, and this is really only the beginning of what you can do with this kind of effect. I find it downright hypnotic.
 
