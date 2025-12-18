@@ -855,6 +855,8 @@ So how big is a workgroup? Apparently [GPUs tend to operate](https://computergra
 
 Let's launch our compute shaders on a $16\times16$ square patch. So there are 256 invocations in a warp and each one is writing 32 instances which means the stride per workgroup is $256\times32=8192$ instances, meaning we'll ultimately be drawing $8192\times16=131,072$ triangles for each workgroup. And with each instance weighing 88 bytes, our buffer will need 720kB of storage per workgroup.
 
+### Calculating the indices
+
 So, let's start by figuring out suitable linear indices within the shader. We're using the global ID to locate us in a 2D grid, and we don't really care about how many workgroups there are.
 
 ```wgsl
@@ -879,7 +881,8 @@ fn create_instances(
 Now we just need to populate those instances. Let's say that the radius of our circle will be defined by the `gid.x` and the height along the z axis will be defined by the `gid.y`. Now we need to calculate the same stuff we did before: start and end positions, plus tangent and bitangent. Luckily, for a circle, that's super easy. Here we go:
 
 ```wgsl
-const tau = radians(360.0);
+const TAU = radians(360.0);
+const SEGMENTS_PER_STRAND = 32;
 
 @compute
 @workgroup_size(16,16,1)
@@ -895,20 +898,20 @@ fn create_instances(
     let radius = f32(gid.x) * 0.1;
     let height = f32(gid.y) * 0.1;
     var end_position = vec3(radius, 0.0, height);
-    var end_normal = vec3(-1.0, 0.0, 0.0);
+    var end_normal = vec3(1.0, 0.0, 0.0);
     let bitangent = vec3(0.0,0.0,1.0);
     let tube_radius = 0.02;
-    for (var i : u32 = 0; i < 256; i++) {
+    for (var i : u32 = 0; i < SEGMENTS_PER_STRAND; i++) {
         let start_position = end_position;
         let start_normal = end_normal;
-        let t = f32(i+1)/256.0;
-        let cos_sin = vec2(cos(t*tau), sin(t*tau));
+        let t = f32(i+1)/f32(SEGMENTS_PER_STRAND);
+        let cos_sin = vec2(cos(t*TAU), sin(t*TAU));
         end_position = vec3(radius * cos_sin, height);
-        end_normal = vec3(-cos_sin, 0.0);
+        end_normal = vec3(cos_sin, 0.0);
 
-        let colour = vec3(t,1.0-t,1.0);
+        let colour = vec3(t,0.0,1.0-t);
 
-        instances[256 * (global_invocation_index) + i] =
+        instances[global_invocation_index * SEGMENTS_PER_STRAND + i] =
             Instance(
                 start_position,
                 start_normal,
@@ -924,22 +927,306 @@ fn create_instances(
 ```
 In this case, of course a lot of the data in our instances is redundant, and we could stand to move it into uniforms. I made the colour vary around each circle to make it clearer what the compute shaders are doing.
 
+### Rendering the indices
+
 Let's set up the pipeline and launch it. First we must define some constants to know how big things are. I'll go for two workgroups to begin with...
 
 ```rust
-const STRANDS: UVec3 = uvec3(32, 16, 1);
-const NUM_STRANDS: usize =
-    Self::STRANDS.x as usize * Self::STRANDS.y as usize * Self::STRANDS.z as usize;
-const SEGMENTS_PER_STRAND: usize = 256;
-const SEGMENTS: usize = Self::NUM_STRANDS * Self::SEGMENTS_PER_STRAND;
+const WORKGROUPS: UVec3 = uvec3(1, 2, 1);
+const WORKGROUP_SIZE: UVec3 = uvec3(16, 16, 1);
+const STRANDS: UVec3 = uvec3(
+    Self::WORKGROUPS.x * Self::WORKGROUP_SIZE.x,
+    Self::WORKGROUPS.y * Self::WORKGROUP_SIZE.y,
+    Self::WORKGROUPS.z * Self::WORKGROUP_SIZE.z,
+); //can't do normal vector multiply because it's not const
+const NUM_STRANDS: usize = (Self::STRANDS.x * Self::STRANDS.y * Self::STRANDS.z) as usize;
+const SEGMENTS_PER_STRAND: usize = 64;
+const NUM_SEGMENTS: usize = Self::NUM_STRANDS * Self::SEGMENTS_PER_STRAND;
 ```
-The instance buffer must be allocated to be big enough to contain all the segment instances. We also need to tell wgpu that we intend to use it as both a storage and vertex buffer.
+The instance buffer must be allocated to be big enough to contain all the segment instances. We also need to tell wgpu that we intend to use it as both a storage and vertex buffer. I thought would like like this...
 
 ```rust
+//too small!!
 let instance_buffer = device.create_buffer(&wgpu::BufferDescriptor {
     label: Some("Noodle instance buffer"),
-    size: (std::mem::size_of::<TubeInstance>() * Self::NUM_STRANDS * 256) as u64,
+    size: (std::mem::size_of::<TubeInstance>() * Self::NUM_SEGMENTS) as u64,
     usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::VERTEX,
     mapped_at_creation: false,
 });
 ```
+However, it turns out that doesn't work for storage buffers. Because of padding, I guess? I decided to allocate enough space for the assumption that every single `vec3` and the final `f32` each take up a full 16 bytes after padding, and that seemed to be enough.
+
+```rust
+let instance_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+    label: Some("Noodle instance buffer"),
+    size: (8 * 16 * Self::NUM_SEGMENTS) as u64,
+    usage: wgpu::BufferUsages::STORAGE,
+    mapped_at_creation: false,
+});
+```
+Seems like in general you should really just fill up any struct like this with `vec4`s. The same does not seem to be true for vertex buffers, confusingly.
+
+That's pretty much all we need, we can go ahead and create the pipeline and bind group.
+
+```rust
+let compute_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+    label: Some("Noodle instance compute shader"),
+    source: wgpu::ShaderSource::Wgsl(include_wesl!("instances").into()),
+});
+
+let compute_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+    label: Some("Noodle instance compute pipeline"),
+    layout: None,
+    module: &compute_shader,
+    entry_point: Some("create_instances"),
+    compilation_options: Default::default(),
+    cache: None,
+});
+
+let compute_bind_group_layout = compute_pipeline.get_bind_group_layout(0);
+
+let compute_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+    label: Some("Noodle compute bind group"),
+    layout: &compute_bind_group_layout,
+    entries: &[wgpu::BindGroupEntry {
+        binding: 0,
+        resource: instance_buffer.as_entire_binding(),
+    }],
+});
+```
+Now, to invoke it, we must create a compute pass before our render pass...
+```rust
+{
+    let mut compute_pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+        label: Some("Compute Pass"),
+        timestamp_writes: None,
+    });
+    self.pipelines.compute_instances(&mut compute_pass);
+}
+```
+...where the `compute_instances` function which tells our compute shader to get to work is pretty simple too.
+
+```rust
+pub fn compute_instances(&self, compute_pass: &mut wgpu::ComputePass) {
+    compute_pass.set_pipeline(&self.compute_pipeline);
+    compute_pass.set_bind_group(0, &self.compute_bind_group, &[]);
+    compute_pass.dispatch_workgroups(Self::WORKGROUPS.x, Self::WORKGROUPS.y, Self::WORKGROUPS.z);
+}
+```
+In theory when we run this, we should see a stack of concentric circles, 3.2 units high and 3.2 units across. In practice, I got... whatever this is.
+
+![A mess of crisscrossing red and blue triangles.](assets/chaos.png)
+
+After some frantic debugging, I figured out that the problem lay not with the compute shader, but with the vertex shader. My assumption that I could simply reintrepret a storage buffer as an index buffer was... naïve, apparently. If we instead do this...
+
+```wgsl
+@group(0) @binding(1) var<storage> instances: array<Instance>;
+
+@vertex
+fn vs_main(vert: VertexInput, @builtin(instance_index) instance_index: u32) -> VertexOutput {
+    let instance = instances[instance_index];
+    //...
+}
+```
+...I get the expected result, a circle. (I mean, once I've changed around the render pipelines to remove the instances from the vertex layout and add it to the bind group instead, anyway.)
+
+I'm not exactly sure what's going on behind the scenes to garble up my data so dramatically, but at least the problem can be solved easily.
+
+Even after that, I had strange results. My circles were all over the place. Rather than a nice vertical stack filling a cylinder, they seemed to be going down instead of up. After a couple of hours of conclusion, I finally figured out my mistake: I had thought I was dispatching the shader with the number of *invocations*, but you actually specify the number of *workgroups*. Remember what I said earlier about out-of-bounds array access? Yeah, that was wreaking merry havoc. Plus, this is where I discovered that my buffer size calculation was too small. But, after *finally* fixing the problem, I got the stack of cylinders I was looking for...
+
+![A stack of layers of concentric rings with a red-blue gradient along each one.](assets/cylinder.png)
+
+## At last, divergence-free fields
+
+It has been a long and bloody battle to get this far. We have the ability to draw tubes. We've figured out how to talk to compute shaders. Now we just need the divergence-free fields.
+
+To begin with, let's grab the gradient noise. It will need porting to WGSL. First, we need a hash function. I'll take [PCG3D](https://github.com/markjarzynski/PCG3D), since there's [a paper](https://jcgt.org/published/0009/03/02/paper.pdf) saying it's the best one. We have to make it slightly more verbose...
+
+```wgsl
+// http://www.jcgt.org/published/0009/03/02/
+fn hash( u : vec3<u32>) -> vec3<f32> {
+    var v = u;
+    v = v * 1664525u + 1013904223u;
+
+    v.x += v.y*v.z;
+    v.y += v.z*v.x;
+    v.z += v.x*v.y;
+
+    v ^= v >> vec3(16);
+
+    v.x += v.y*v.z;
+    v.y += v.z*v.x;
+    v.z += v.x*v.y;
+
+    return vec3<f32>(v) * (1.0/f32(0xffffffffu));
+}
+```
+Armed with a suitable hash, we can now adapt [Inigo's gradient noise with derivatives](https://iquilezles.org/articles/gradientnoise/).
+
+```wgsl
+// adapted from Inigo Quilez
+// https://iquilezles.org/articles/gradientnoise/
+fn noised( x : vec3<f32> ) -> vec4<f32>
+{
+  // grid
+  let i = vec3<u32>(floor(x));
+
+  let f = fract(x);
+
+  // quintic interpolant
+  let u = f*f*f*(f*(f*6.0-15.0)+10.0);
+  let du = 30.0*f*f*(f*(f-2.0)+1.0);
+
+  // gradients
+  let ga = hash( i+vec3(0,0,0) );
+  let gb = hash( i+vec3(1,0,0) );
+  let gc = hash( i+vec3(0,1,0) );
+  let gd = hash( i+vec3(1,1,0) );
+  let ge = hash( i+vec3(0,0,1) );
+  let gf = hash( i+vec3(1,0,1) );
+  let gg = hash( i+vec3(0,1,1) );
+  let gh = hash( i+vec3(1,1,1) );
+
+  // projections
+  let va = dot( ga, f-vec3(0.0,0.0,0.0) );
+  let vb = dot( gb, f-vec3(1.0,0.0,0.0) );
+  let vc = dot( gc, f-vec3(0.0,1.0,0.0) );
+  let vd = dot( gd, f-vec3(1.0,1.0,0.0) );
+  let ve = dot( ge, f-vec3(0.0,0.0,1.0) );
+  let vf = dot( gf, f-vec3(1.0,0.0,1.0) );
+  let vg = dot( gg, f-vec3(0.0,1.0,1.0) );
+  let vh = dot( gh, f-vec3(1.0,1.0,1.0) );
+
+  // interpolations
+  let k0 = va-vb-vc+vd;
+  let g0 = ga-gb-gc+gd;
+  let k1 = va-vc-ve+vg;
+  let g1 = ga-gc-ge+gg;
+  let k2 = va-vb-ve+vf;
+  let g2 = ga-gb-ge+gf;
+  let k3 = -va+vb+vc-vd+ve-vf-vg+vh;
+  let g3 = -ga+gb+gc-gd+ge-gf-gg+gh;
+  let k4 = vb-va;
+  let g4 = gb-ga;
+  let k5 = vc-va;
+  let g5 = gc-ga;
+  let k6 = ve-va;
+  let g6 = ge-ga;
+
+  return vec4( va + k4*u.x + k5*u.y + k6*u.z + k0*u.x*u.y + k1*u.y*u.z + k2*u.z*u.x + k3*u.x*u.y*u.z,    // value
+               ga + g4*u.x + g5*u.y + g6*u.z + g0*u.x*u.y + g1*u.y*u.z + g2*u.z*u.x + g3*u.x*u.y*u.z +   // derivatives
+               du * (vec3(k4,k5,k6) +
+                     vec3(k0,k1,k2)*u.yzx +
+                     vec3(k2,k0,k1)*u.zxy +
+                     k3*u.yzx*u.zxy ));
+}
+```
+If you would like to learn more about gradient noise, I refer you to [The Book of Shaders](https://thebookofshaders.com/11/) and [Catlike Coding](https://catlikecoding.com/unity/tutorials/pseudorandom-surfaces/perlin-derivatives/).
+
+Now we need to go from gradient noise to curl noise. Given some offset vector, we can just evaluate the noise function in two different places. For the normal and binormal... well, I'm not sure how to calculate the proper Frenet-Serret ones but we don't need them. We can take one of the gradients we already calculated as one basis vector, and the other is a cross product and normalize away. (Sadly we can't assume that they are perpendicular in general.)
+
+```wgsl
+struct Frame {
+    normal: vec3<f32>,
+    binormal: vec3<f32>,
+    tangent: vec3<f32>,
+}
+
+fn bitangent_noise(position: vec3<f32>, offset: vec3<f32>, scale: f32) -> Frame {
+    let noise_up = noised(position * scale + offset).yzw;
+    let noise_down = noised(-position * scale + offset).yzw;
+    let tangent = cross(noise_up, noise_down);
+    let normal = normalize(noise_up);
+    let binormal = normalize(cross(normal,tangent));
+    return Frame(normal,binormal,tangent);
+}
+```
+However, on some testing, I found that curl noise generally produced much nicer looking results, with fewer janky zigzags. So let's include that too.
+
+```wgsl
+fn curl_noise(position: vec3<f32>, offset_y: vec3<f32>, offset_z: vec3<f32>, scale: f32) -> Frame {
+    let gx = noised(position * scale).yzw;
+    let gy = noised(position * scale + offset_y).yzw;
+    let gz = noised(position * scale + offset_z).yzw;
+    let tangent = vec3(gz.y - gy.z, gx.z - gz.x, gy.x - gx.y);
+    let tangent_norm = normalize(tangent);
+    let normal = normalize(cross(tangent_norm, vec3(0.0,1.0,0.0)));
+    let binormal = cross(normal,tangent_norm);
+    return Frame(normal,binormal,tangent);
+}
+```
+One question I am not sure the answer to is whether it is better to return the normalised tangent (which gives a fixed step size) or the unnormalised tangent (which means the strands are 'slower' where the field is weaker). Right now, I'm not normalising it.
+
+## Enjoying our noodles
+
+So now all that remains is to call this function repeatedly and see where it takes us!
+
+First up, constants...
+
+```wgsl
+const STEP_SIZE = 0.05;
+const NOISE_SCALE = 0.5;
+const NOISE_OFFSET_1 = vec3(100.0);
+const NOISE_OFFSET_2 = vec3(300.0)*vec3(1.0,-1.0,-1.0);
+const GRID_SPACING = 0.3;
+```
+We should ideally pass these in as uniforms and add a UI to configure them, but for now, hardcoded.
+
+Next up, the actual integration. It's pretty simple in the end.
+
+```wgsl
+@compute
+@workgroup_size(16,16,1)
+fn create_instances(
+    @builtin(global_invocation_id) gid: vec3<u32>,
+    @builtin(num_workgroups) num_workgroups: vec3<u32>,
+) {
+    let grid_size = num_workgroups * vec3(16,16,1);
+    let global_invocation_index =
+        grid_size.y * grid_size.x * gid.z
+        + grid_size.x * gid.y
+        + gid.x;
+    let total_invocations = grid_size.x * grid_size.y * grid_size.z;
+    let x_init = f32(gid.x) * GRID_SPACING;
+    let y_init = f32(gid.y) * GRID_SPACING;
+    var end_position = vec3(x_init, 0.0, y_init);
+    let offset_1 = vec3(100.0,uniforms.time,  100.0);
+    let offset_2 = vec3( -100.0,uniforms.time, -150.0);
+    var frame = curl_noise(end_position, offset_1, offset_2, NOISE_SCALE);
+    var end_normal = frame.normal;
+    var end_binormal = frame.binormal;
+    //let colour = hsv2rgb(vec3(f32(global_invocation_index)/f32(total_invocations),0.4,1.0));
+    let colour = vec3(f32(global_invocation_index)/f32(total_invocations));
+
+    for (var i : u32 = 0; i < SEGMENTS_PER_STRAND; i++) {
+        let start_position = end_position;
+        let start_normal = end_normal;
+        let start_binormal = end_binormal;
+        frame = curl_noise(end_position, offset_1, offset_2, NOISE_SCALE);
+        end_position += frame.tangent * STEP_SIZE;
+        end_normal = frame.normal;
+        end_binormal = frame.binormal;
+
+        instances[global_invocation_index * SEGMENTS_PER_STRAND + i] =
+            Instance(
+                start_position,
+                start_normal,
+                start_binormal,
+                end_position,
+                end_normal,
+                end_binormal,
+                colour,
+                TUBE_RADIUS,
+            );
+    }
+}
+```
+I chose to colour the strands with a simple black to white gradient, but you may prefer to shade them differently.
+
+Now for the result...
+
+![A complex spiraling shape made of white strands](assets/realtime-uzumaki.png)
+
+I adjusted the camera positioning to give it a lissajous motion that flies you in and out of the noodles. You can see it in-browser here (todo: upload the web build).
+
+(If there's time before this goes live, I'd like to add some controls over the parameters and let people explore the space of this effect some more, and maybe solve the planar discontinuities. This is probably enough to be going with though!)
