@@ -474,7 +474,7 @@ let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
     mapped_at_creation: false,
 });
 ```
-wgpu requires a 16-byte aligned size, and will get upset if it doesn't get it. In this case we are actually guaranteed that, but I always round the size to a multiple of 16 just in case. The compute shader won't be messing with this buffer.
+wgpu requires a 16-byte aligned size, and will get upset if it doesn't get it. In this case we are actually guaranteed that, but I always round the size to a multiple of 16 just in case. The `usage` field tells wgpu that we want to read it as a uniform and write to it from the CPU.
 
 The pipeline layout field is mostly used to pass in a bind group layout, which tells the pipeline about the kinds of resources (such as uniform buffers, storage buffers, texture samplers and so forth) it can provide to the shaders. You can have multiple different bind groups with the same layout, and plug them into the same render pipeline.
 
@@ -532,7 +532,7 @@ I've just picked some arbitrary values for lights for now. I'm using a right-han
 
 We're almost at the point where we can render some tubes. We have the render pipeline, now we just need some buffers to render.
 
-To render a model, we normally generally need vertices and triangle indices. Since our model is so simple, we can generate these programmatically on the CPU.
+To render a model, we generally need vertices and triangle indices. Since our model is so simple, we can generate these programmatically on the CPU.
 
 We're dealing with angles, so this is a great time to grab $\pi$ and $\tau$ from the standard library.
 
@@ -582,11 +582,15 @@ $$
 
 so in our case,
 
-$$\mathbf{T}(t)=\frac{1}{\sqrt{1+\cos^2 t}}\begin{pmatrix}0, 1, \cos t\end{pmatrix}$$
+$$
+\mathbf{T}(t)=\frac{1}{\sqrt{1+\cos^2 t}}\begin{pmatrix}0 \\ 1 \\ \cos t\end{pmatrix}
+$$
 
 So the normal vector must be...
 
-$$\mathbf{N}=\mathbf{T}\times\mathbf{B}=\frac{1}{\sqrt{1+\cos^2 t}}\begin{pmatrix}0 \\ -\cos t \\ 1\end{pmatrix}$$
+$$
+\mathbf{N}=\mathbf{T}\times\mathbf{B}=\frac{1}{\sqrt{1+\cos^2 t}}\begin{pmatrix}0 \\ -\cos t \\ 1\end{pmatrix}
+$$
 
 But we can skip the normalisation factor and just call `normalize()`.
 
@@ -622,7 +626,7 @@ fn create_sinusoid_instances(device: &wgpu::Device) -> wgpu::Buffer {
 ```
 We can call this function and keep the buffer around to pass slices in during rendering.
 
-You might wonder why we have `BufferUsages::Vertex` here, when this is a buffer for instances. The answer is that instance buffers are considered a type of vertex buffer. Earlier on, when we declared our vertex buffer layouts, we specified whether they use `step_mode` of `Instance` or `Vertex`. That's the only difference.
+You might wonder why we have `BufferUsages::Vertex` here, when this is a buffer for instances. The answer is that instance buffers are considered a type of vertex buffer. Earlier on, when we declared our vertex buffer layouts, we specified whether they use `step_mode` of `Instance` or `Vertex`. That's the only difference. (However, later this is going to prove problematic...)
 
 All of this can now be bundled up in a struct which holds handles to all the GPU stuff we might need to use for rendering.
 
@@ -693,7 +697,7 @@ self.pipelines.update_uniforms(
     self.pipelines.render(&mut render_pass);
 }
 ```
-Note that because we're using reverse depth, we must clear the depth buffer to zero, not one. Why is the render pass in a block? Well, wgpu automatically writes it to the command buffer when it's dropped.
+Note that because we're using reverse depth, we must clear the depth buffer to zero, not one. Why is the render pass in a block? Well, wgpu automatically writes it to the command buffer *when it's dropped*.
 
 ![A line of four sinusoids in a grey void.](assets/sinusoids.png)
 
@@ -847,13 +851,13 @@ It seems that storage buffers in WGSL are inherently one-dimensional. To figure 
 
 What happens if we try to read or write out of bounds of an array? [A few things, most of them bad](https://www.w3.org/TR/WGSL/#out-of-bounds-access-sec). If we're lucky, the invocation simply dies and outputs zeroes. For loads and stores, weird stuff can happen, including writing to random places. Also if there's a barrier it might 'hang the shader', which sounds real bad. So we'd better be pretty careful not to do that.
 
-But let's assume we have a sufficiently large storage buffer. In this case, we could have each invocation write one instance and exit. However, later we'll want to follow field lines, and since each segment depends on the previous segment's position, we'll need to write a whole series of instances in one invocation. Essentially, each compute shader will 'own' a single noodle.
+But let's assume we have a sufficiently large storage buffer. In this case, we could have each invocation write one instance and exit. However, later we'll want to follow field lines, and since each segment depends on the previous segment's position, we'll need to write a whole series of instances in one invocation. Essentially, each compute shader invocation will 'own' a single noodle.
 
 ### Figuring out the invocation size
 
 Since that's the ultimate plan, I'll follow a similar design here. Let's draw a bunch of concentric rings. Each ring will be the same length, shall we say 32 segments long. So each invocation must write 32 segments.
 
-We need to convert each invocation's global invocation ID into an index into the storage buffer. So the stride per invocation is 64. Unfortunately, we don't get a `global_invocation_index` builtin. However, if we let each workgroup get its own block of the storage buffer, we can just use the `local_invocation_index`.
+We need to convert each invocation's global invocation ID into an index into the storage buffer. So the stride per invocation is 32. Unfortunately, we don't get a `global_invocation_index` builtin. However, if we let each workgroup get its own block of the storage buffer, we can just use the `local_invocation_index`.
 
 So how big is a workgroup? Apparently [GPUs tend to operate](https://computergraphics.stackexchange.com/questions/12462/compute-shader-workgroups-execution-and-size) in 'waves' (AMD) of 64 threads or 'warps' (nVidia) of 32 threads, the workgroup size should ideally be a multiple of 64 so it can be evenly split between them.
 
@@ -944,7 +948,7 @@ const STRANDS: UVec3 = uvec3(
     Self::WORKGROUPS.z * Self::WORKGROUP_SIZE.z,
 ); //can't do normal vector multiply because it's not const
 const NUM_STRANDS: usize = (Self::STRANDS.x * Self::STRANDS.y * Self::STRANDS.z) as usize;
-const SEGMENTS_PER_STRAND: usize = 64;
+const SEGMENTS_PER_STRAND: usize = 32;
 const NUM_SEGMENTS: usize = Self::NUM_STRANDS * Self::SEGMENTS_PER_STRAND;
 ```
 The instance buffer must be allocated to be big enough to contain all the segment instances. We also need to tell wgpu that we intend to use it as both a storage and vertex buffer. I thought would like like this...
@@ -968,7 +972,7 @@ let instance_buffer = device.create_buffer(&wgpu::BufferDescriptor {
     mapped_at_creation: false,
 });
 ```
-Seems like in general you should really just fill up any struct like this with `vec4`s. The same does not seem to be true for vertex buffers, confusingly.
+Seems like in general you should really just fill up any struct like this with `vec4`s. The same does not seem to be true for vertex buffers, confusingly. (In fact, as we'll soon see, I have no damn clue how vertex buffers are laid out, maybe it's some kind of 'struct of arrays' situation.)
 
 That's pretty much all we need, we can go ahead and create the pipeline and bind group.
 
@@ -1021,7 +1025,7 @@ In theory when we run this, we should see a stack of concentric circles, 3.2 uni
 
 ![A mess of crisscrossing red and blue triangles.](assets/chaos.png)
 
-After some frantic debugging, I figured out that the problem lay not with the compute shader, but with the vertex shader. My assumption that I could simply reintrepret a storage buffer as an index buffer was... naïve, apparently. If we instead do this...
+After some frantic debugging, I figured out that the problem lay not with the compute shader, but with the vertex shader. My assumption that I could simply reintrepret a storage buffer as an instance buffer was... naïve, apparently. If we instead do this...
 
 ```wgsl
 @group(0) @binding(1) var<storage> instances: array<Instance>;
@@ -1036,7 +1040,7 @@ fn vs_main(vert: VertexInput, @builtin(instance_index) instance_index: u32) -> V
 
 I'm not exactly sure what's going on behind the scenes to garble up my data so dramatically, but at least the problem can be solved easily.
 
-Even after that, I had strange results. My circles were all over the place. Rather than a nice vertical stack filling a cylinder, they seemed to be going down instead of up. After a couple of hours of conclusion, I finally figured out my mistake: I had thought I was dispatching the shader with the number of *invocations*, but you actually specify the number of *workgroups*. Remember what I said earlier about out-of-bounds array access? Yeah, that was wreaking merry havoc. Plus, this is where I discovered that my buffer size calculation was too small. But, after *finally* fixing the problem, I got the stack of cylinders I was looking for...
+Even after that, I had strange results. My circles were all over the place. Rather than a nice vertical stack filling a cylinder, they seemed to be going down instead of up in larger and larger rings. After a couple of hours of confusion, I finally figured out my mistake: I had thought I was dispatching the shader with the number of *invocations*, but you actually specify the number of *workgroups*. Remember what I said earlier about out-of-bounds array access? Yeah, that was wreaking merry havoc. Plus, this is where I discovered that my buffer size calculation was too small. But, after *finally* fixing the problem, I got the stack of cylinders I was looking for...
 
 ![A stack of layers of concentric rings with a red-blue gradient along each one.](assets/cylinder.png)
 
