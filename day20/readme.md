@@ -2,11 +2,11 @@
 
 On creating complex, swirly noodle shapes with compute shaders in Rust and wgpu.
 
-> Absolutely no AI was used.
+*by [canmom](https://canmom.art). Absolutely no AI was used.*
 
 ## What are we trying to do here?
 
-Well the short answer is that we're gonna make [this](https://canmom.art/noodles/). The long answer follows...
+Well the short answer is that we're gonna make [this](https://canmom.art/noodles/) ([source](https://github.com/canmom/noodles)). The long answer follows...
 
 Have a look at this image.
 
