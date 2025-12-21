@@ -72,7 +72,7 @@ If you prefer not to use Git or GitHub, you can **always email or contact us** (
 | **December 18** | Starfighter | [​The Recursive Swedish Sphere Algorithm](day18/readme.md) | 🎅 Open |
 | **December 19** | Frank Taylor | [Markov Melody Machine](day19/readme.md) | 🎅 Open |
 | **December 20** | [canmom](https://github.com/canmom)| [A Nest of Divergence-Free Fields](day20/readme.md) | 🎅 Open |
-| **December 21** | Starfighter  | A Generic Sequencer for JS/TS and GLSL | 🔒 Claimed
+| **December 21** | Coop  | [A Generic Sequencer for JS/TS and GLSL](day21/readme.md) | 🎅 Open
 | **December 22** | Magnus Thor | Ray Marching Complex Life into a WebGPU Fragment Shader | 🔒 Claimed |
 | **December 23** | [Mårten 'mrange' Rånge](https://github.com/mrange/) | TBA | 🔒 Claimed |
 | **December 24** | Ricky Davies| TBA | 🔒 Claimed |
